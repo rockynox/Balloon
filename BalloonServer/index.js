@@ -5,20 +5,21 @@
 const express = require('express')
 const app = express()
 const port = 3000
-
 var bodyParser = require('body-parser')
 app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
 }));
 
+var balloonOrder = ""
+
 // var rpio = require('rpio');
 
 var SerialPort = require("serialport")
-var serialPort = new SerialPort("/dev/cu.usbmodem1411", { baudrate: 115200 });
+var serialPort = new SerialPort("/dev/cu.usbmodem1411", {baudrate: 115200});
 
 app.post('/', (request, response) => {
-    var balloonOrder = request.body.balloonOrder
+    balloonOrder = request.body.balloonOrder
     var message = balloonOrder ? "Je donne tout !!!" : "You are saving the earth, bro"
 
     console.log(message);
@@ -32,8 +33,22 @@ app.post('/', (request, response) => {
     ))
 })
 
+app.get('/', (request, response) => {
+    var message = balloonOrder ? "Je suis chaud mirelle !!!" : "You are saving the earth, bro"
+
+    console.log(message);
+    resolveOrder(balloonOrder);
+
+    response.send(JSON.stringify(
+        {
+            message: message,
+            balloonStatus: balloonOrder
+        }
+    ))
+})
+
 resolveOrder = (balloonOrder) => {
-    sendToArduino(balloonOrder ? 1 : 0)
+    sendToArduino(balloonOrder)
 }
 
 app.listen(port, (err) => {

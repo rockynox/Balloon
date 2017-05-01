@@ -59,8 +59,12 @@ On serial port :
 
 #TODO
 
-- Implement the Refresh status and the Auto mode
-- Make this app a standalone app
-- Put some push notification
+- Implement the Refresh status and the Auto mode (TODO : test)
+- Make this app a standalone app (complete the app.json)
+- LCD Screen with status prompt
+- Implement the router/navigation
+- Put some push notification 
 - Put some reminder based on your habits "do you want some hot water for your shower"
-
+- With relay + arduino AdafruitWifi, auto control of the music (wake up music...)
+- Play music based on the humor (image recognition -> miscrosoft API)
+- Voice control ? 

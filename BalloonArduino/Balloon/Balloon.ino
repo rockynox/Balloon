@@ -17,9 +17,11 @@ void loop() {
           Serial.println(incomingData, DEC);
   }
   
-  if(incomingData) {
+  if(incomingData == 0) {
     Servo.write(55);
-  } else {
+  } else if (incomingData == 1) {
     Servo.write(139);
+  } else {
+    Servo.write(100);
   }
 }

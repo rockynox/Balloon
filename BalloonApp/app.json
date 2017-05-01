@@ -1,5 +1,16 @@
 {
   "expo": {
-    "sdkVersion": "16.0.0"
+    "sdkVersion": "16.0.0",
+    "name": "Balloon",
+    "icon": "https://s3.amazonaws.com/exp-us-standard/rnplay/app-icon.png",
+    "version": "1.0.0",
+    "slug": "balloon",
+    "orientation": "portrait",
+    "ios": {
+      "bundleIdentifier": "cie.rockynox.balloon"
+    },
+    "android": {
+      "package": "cie.rockynox.balloon"
+    }
   }
 }
