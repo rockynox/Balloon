@@ -1,0 +1,17 @@
+{
+  "name": "balloon",
+  "version": "1.0.0",
+  "description": "Une petite App pour avoir de l'eau chaude",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Rockynox",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "express": "^4.15.2",
+    "rpio": "^0.9.16",
+    "serialport": "^4.0.7"
+  }
+}
