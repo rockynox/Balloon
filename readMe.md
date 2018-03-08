@@ -1,33 +1,33 @@
-#Balloon Project
+# Balloon Project
 *Build a smart Home with a RasberryPi, Arduino and React-native*
 
 
 ## A. Architecture
 
-The communication between :
+#### The communication between :
 - The App and the server is made by a REST service.
 - The Arduino and the RasberryPi is made by the serial port.
 
 
-### 1. RasberryPi (server)
+### 1. BalloonApp (React-Native)
+React-Native build with Expo.
+
+```
+npm start
+```
+
+### 2. [V1] BalloonServer (RasberryPi)
+
+Node server on Raspberry controlling Arduino.
 
 To launch the server :
 ```
 node index.js
 ```
 
-- Node server
-- REST service
+### 3. [V2] BalloonMCU (NodeMCU)
 
-### 2. App (React-Native)
-
-```
-npm start
-```
-
-### 3. Arduino
-
-With **servo.h** library.
+C program for NodeMCU chip
 
 ## B. REST formalisation
 
@@ -35,14 +35,27 @@ With **servo.h** library.
 With JSON body : 
 ```
     {
-        'balloonOrder' : balloonOrder
+        'balloonOrder' : adruinoCode
     }
 ```
+Where arduino code is the code sent to the Arduino
 
--- Response -- 
+-- Response --
 200
 With JSON body :
 ``` 
+    {
+        message: message,
+        balloonStatus: balloonOrder
+    }
+```
+
+- GET on '/' :
+
+-- Response --
+200
+With JSON body :
+```
     {
         message: message,
         balloonStatus: balloonOrder
@@ -56,8 +69,13 @@ On serial port :
  - 1 : Balloon ON
  - 2 : Baloon AUTO
  
+## ToolsBox
 
-#TODO
+### Copy over SSH (on rasberryPi for example
+
+
+
+## TODO
 
 - Implement the Refresh status and the Auto mode (TODO : test)
 - Make this app a standalone app (complete the app.json)

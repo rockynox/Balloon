@@ -8,10 +8,25 @@ import {Constants} from 'expo'
 import settings from "./settings"
 import {Ionicons} from '@expo/vector-icons';
 
-const mode = {
-    "0": "Balloon OFF",
-    "1": "Balloon ON",
-    "2": "Balloon AUTO"
+const modes = {
+    OFF : {
+        id : 0,
+        name : "Balloon OFF",
+        message : "You are saving the earth, bro",
+        arduinoCode: 0
+    },
+    ON : {
+        id : 1,
+        name : "Balloon ON",
+        message : "Ca chauffe dans mon body !!!",
+        arduinoCode: 1
+    },
+    AUTO : {
+        id : 2,
+        name : "Balloon AUTO",
+        message : "Je gère, l'ami !",
+        arduinoCode: 2
+    }
 }
 
 export default class App extends Component {
@@ -22,18 +37,24 @@ export default class App extends Component {
         isRefreshing: "",
     };
 
-    render() {
+    componentWillMount() {
         this.refreshStatus();
+    }
+
+    render() {
         return (
             <View style={styles.container}>
-                <View style={{flex: 2}}/>
+                <View style={{flex: 1}}/>
                 <Button
                     title="On en est ou ?"
                     onPress={this.refreshStatus}
                     style={{flex: 1}}
                 />
+                <View style={{flex: 1}}/>
                 {this.renderToogle()}
+                <View style={{flex: 1}}/>
                 {this.renderBalloonStatus()}
+                <View style={{flex: 1}}/>
             </View>
         );
     }
@@ -43,17 +64,18 @@ export default class App extends Component {
             <View style={{
                 flex: 1,
                 flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
             }}>
-                <TouchableOpacity onPress={this.toogleBalloon(0)}>
-                    <Ionicons name="ios-snow" size={32} color={this.state.balloonOrder === 0 ? "blue" : ""} />
+                <TouchableOpacity onPress={() => {this.toogleBalloon(modes.OFF)}} style={{flex:1, alignItems:'center'}}>
+                    <Ionicons name="ios-snow" size={55} color={this.state.balloonOrder.id === 0 ? "blue" : "black"} />
+                    <Text>OFF</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={this.toogleBalloon(2)}>
-                    <Ionicons name="cycle" size={32} color={this.state.balloonOrder === 2 ? "green" : ""} />
+                <TouchableOpacity onPress={() => {this.toogleBalloon(modes.AUTO)}} style={{flex:1, alignItems:'center'}}>
+                    <Ionicons name="md-infinite" size={55} color={this.state.balloonOrder.id === 2 ? "green" : "black"} />
+                    <Text>AUTO</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={this.toogleBalloon(1)}>
-                    <Ionicons name="ios-bonfire" size={32} color={this.state.balloonOrder === 1 ? "red" : ""} />
+                <TouchableOpacity onPress={() => {this.toogleBalloon(modes.ON)}} style={{flex:1, alignItems:'center'}}>
+                    <Ionicons name="ios-bonfire" size={55} color={this.state.balloonOrder.id === 1 ? "red" : "black"} />
+                    <Text>ON</Text>
                 </TouchableOpacity>
             </View>
         )
@@ -61,29 +83,32 @@ export default class App extends Component {
 
     renderBalloonStatus = () => {
         return (
-            <View>
-                <View style={{flex: 3}}/>
+            <View style={{flex:1}}>
                 { this.state.isRefreshing ?
                     <ActivityIndicator
                         size="large"
                         color="#0000ff"
                     /> :
-                    <View>
+                    <View style={{flex:1, flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
                         <Text style={{flex: 1}}>{this.state.AppStatus}</Text>
-                        <Ionicons name="thermometer" size={32} color={this.state.balloonStatus === 0 ? "blue" : this.state.balloonStatus === 1 ? "red" : "green"} />
+                        <Ionicons
+                            name="ios-thermometer"
+                            size={32}
+                            color={this.state.balloonStatus === 0 ? "blue" : this.state.balloonStatus === 1 ? "red" : "green"}
+                            style={{flex:1}}
+                        />
                     </View>
                 }
-                <View style={{flex: 2}}/>
             </View>
         )
     }
 
-    toogleBalloon = (order) => {
+    toogleBalloon = (mode) => {
         this.setState({
             AppStatus: "Je donne tout pour envoyer l'ordre, chef !",
-            balloonOrder: order
+            balloonOrder: mode
         })
-        this.sendOrder();
+        this.sendOrder(mode);
     }
 
     refreshStatus = async() => {
@@ -94,7 +119,6 @@ export default class App extends Component {
                 response = await response.json();
                 this.setState({
                     balloonStatus: response.balloonStatus,
-                    balloonOrder: !response.balloonStatus,
                     AppStatus: "Le balloon dit : " + response.message
                 })
             }
@@ -104,7 +128,7 @@ export default class App extends Component {
         this.setState({isRefreshing: false})
     }
 
-    sendOrder = async () => {
+    sendOrder = async (mode) => {
         this.setState({isRefreshing: true})
         try {
             let response = await fetch(settings.RASBERRYPI_URL, {
@@ -113,7 +137,8 @@ export default class App extends Component {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    'balloonOrder': this.state.balloonOrder
+                    'arduinoCode': mode.arduinoCode,
+                    'message' : mode.message
                 })
             })
             if (response.status === 200) {
@@ -133,9 +158,8 @@ export default class App extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        alignItems: 'stretch',
         flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
         paddingTop: Constants.statusBarHeight,
         backgroundColor: '#ecf0f1',
     },

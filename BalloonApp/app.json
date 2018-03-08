@@ -2,7 +2,7 @@
   "expo": {
     "sdkVersion": "16.0.0",
     "name": "Balloon",
-    "icon": "https://s3.amazonaws.com/exp-us-standard/rnplay/app-icon.png",
+    "icon": "./Ressources/icon.png",
     "version": "1.0.0",
     "slug": "balloon",
     "orientation": "portrait",

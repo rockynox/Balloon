@@ -16,33 +16,32 @@ var balloonOrder = ""
 // var rpio = require('rpio');
 
 var SerialPort = require("serialport")
-var serialPort = new SerialPort("/dev/cu.usbmodem1411", {baudrate: 115200});
+var serialPort = new SerialPort("/dev/cu.usbmodem1421", {baudrate: 115200});
 
 app.post('/', (request, response) => {
-    balloonOrder = request.body.balloonOrder
-    var message = balloonOrder ? "Je donne tout !!!" : "You are saving the earth, bro"
 
-    console.log(message);
-    resolveOrder(balloonOrder);
+    balloonOrder = request.body
+
+    console.log(request.body.message);
+    resolveOrder(request.body.arduinoCode);
 
     response.send(JSON.stringify(
         {
-            message: message,
-            balloonStatus: balloonOrder
+            message: request.body.message,
+            balloonStatus: balloonOrder.arduinoCode
         }
     ))
 })
 
 app.get('/', (request, response) => {
-    var message = balloonOrder ? "Je suis chaud mirelle !!!" : "You are saving the earth, bro"
 
-    console.log(message);
-    resolveOrder(balloonOrder);
+    console.log(balloonOrder.message);
+    resolveOrder(balloonOrder.arduinoCode);
 
     response.send(JSON.stringify(
         {
-            message: message,
-            balloonStatus: balloonOrder
+            message: balloonOrder.message,
+            balloonStatus: balloonOrder.arduinoCode
         }
     ))
 })

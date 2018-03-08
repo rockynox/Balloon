@@ -1,5 +1,5 @@
 
-let RASBERRYPI_URL = 'http://77.132.27.38:1234';
+let RASBERRYPI_URL = 'http://5.51.196.32:1234';
 
 
 
