@@ -31,8 +31,8 @@ const modes = {
 
 export default class App extends Component {
     state = {
-        AppStatus: "",
-        balloonStatus: false,
+        balloonStatusMessage: "",
+        balloonStatusCode: false,
         balloonOrder: "",
         isRefreshing: "",
     };
@@ -90,11 +90,11 @@ export default class App extends Component {
                         color="#0000ff"
                     /> :
                     <View style={{flex:1, flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-                        <Text style={{flex: 1}}>{this.state.AppStatus}</Text>
+                        <Text style={{flex: 1}}>{this.state.balloonStatusMessage}</Text>
                         <Ionicons
                             name="ios-thermometer"
                             size={32}
-                            color={this.state.balloonStatus === 0 ? "blue" : this.state.balloonStatus === 1 ? "red" : "green"}
+                            color={this.state.balloonStatusCode === 0 ? "blue" : this.state.balloonStatusCode === 1 ? "red" : "green"}
                             style={{flex:1}}
                         />
                     </View>
@@ -105,7 +105,7 @@ export default class App extends Component {
 
     toogleBalloon = (mode) => {
         this.setState({
-            AppStatus: "Je donne tout pour envoyer l'ordre, chef !",
+            balloonStatusMessage: "Je donne tout pour envoyer l'ordre, chef !",
             balloonOrder: mode
         })
         this.sendOrder(mode);
@@ -118,12 +118,12 @@ export default class App extends Component {
             if (response.status === 200) {
                 response = await response.json();
                 this.setState({
-                    balloonStatus: response.balloonStatus,
-                    AppStatus: "Le balloon dit : " + response.message
+                    balloonStatusCode: response.balloonStatusCode,
+                    balloonStatusMessage: "Le balloon dit : " + response.message
                 })
             }
         } catch (error) {
-            this.setState({AppStatus: "J'arrive pas à joindre la Pi chef !"})
+            this.setState({balloonStatusMessage: "J'arrive pas à joindre la Pi chef !"})
         }
         this.setState({isRefreshing: false})
     }
@@ -137,19 +137,19 @@ export default class App extends Component {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    'arduinoCode': mode.arduinoCode,
+                    "code": mode.code,
                     'message' : mode.message
                 })
             })
             if (response.status === 200) {
                 response = await response.json()
                 this.setState({
-                    balloonStatus: response.balloonStatus,
-                    AppStatus: "Le balloon dit : " + response.message
+                    balloonStatusCode: response.balloonStatusCode,
+                    balloonStatusMessage: "Le balloon dit : " + response.message
                 })
             }
         } catch (error) {
-            this.setState({AppStatus: "J'arrive pas à joindre la Pi chef !"})
+            this.setState({balloonStatusMessage: "J'arrive pas à joindre la Pi chef !"})
         }
         this.setState({isRefreshing: false})
     };
@@ -160,7 +160,6 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'stretch',
         flexDirection: 'column',
-        paddingTop: Constants.statusBarHeight,
         backgroundColor: '#ecf0f1',
     },
 });

@@ -16,7 +16,7 @@ var balloonOrder = ""
 // var rpio = require('rpio');
 
 var SerialPort = require("serialport")
-var serialPort = new SerialPort("/dev/cu.usbmodem1421", {baudrate: 115200});
+var serialPort = new SerialPort("/dev/ttyACM0", {baudrate: 115200});
 
 app.post('/', (request, response) => {
 
