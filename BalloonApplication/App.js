@@ -7,26 +7,35 @@ import settings from './settings';
 const BALLOON_ORDER = {
     ON: {
         code: 1,
-        statusCode: 1,
     },
     AUTO: {
         code: 2,
-        statusCode: 2,
     },
 };
 
-const BALLOON_STATUS_MESSAGE = {
-    sendingOrder: 'Je donne tout pour envoyer l\'ordre, chef !',
-    ON: 'Ca chauffe dans mon body !!!',
-    AUTO: 'Je gère, l\'ami !',
-    ERROR: 'J\'arrive pas à joindre le balloon l\'ami !',
-};
+const BALLOON_STATUS = [
+        SENDING_ORDER = {
+            message: 'Je donne tout pour envoyer l\'ordre, chef !',
+        },
+        ON = {
+            message: 'Ca chauffe dans mon body !!!',
+            orderCode: 1,
+        },
+        AUTO = {
+            message: 'Je gère, l\'ami !',
+            orderCode: 2,
+        },
+        ERROR = {
+            message: 'J\'arrive pas à joindre le balloon l\'ami !',
+        },
+    ]
+;
 
 export default class App extends React.Component {
     state = {
         balloonStatusCode: null,
         balloonStatusMessage: '',
-        balloonOrder: '',
+        sentOrder: '',
         isRefreshing: '',
     };
 
@@ -59,18 +68,18 @@ export default class App extends React.Component {
                 flexDirection: 'row',
             }}>
                 <TouchableOpacity onPress={() => {
-                    this.toogleBalloon(BALLOON_ORDER.AUTO);
+                    this.toogleBalloonStatus(BALLOON_STATUS.AUTO);
                 }} style={{flex: 1, alignItems: 'center'}}>
                     <Ionicons name="md-infinite" size={55}
-                              color={this.state.balloonOrder === BALLOON_ORDER.AUTO ? 'green' : 'black'}/>
+                              color={this.state.sentOrder === BALLOON_STATUS.AUTO ? 'green' : 'black'}/>
                     <Text>AUTO</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => {
-                    this.toogleBalloon(BALLOON_ORDER.ON);
+                    this.toogleBalloonStatus(BALLOON_STATUS.ON);
                 }} style={{flex: 1, alignItems: 'center'}}>
                     <Ionicons name="ios-bonfire" size={55}
-                              color={this.state.balloonOrder === BALLOON_ORDER.ON ? 'red' : 'black'}/>
+                              color={this.state.sentOrder === BALLOON_STATUS.ON ? 'red' : 'black'}/>
                     <Text>ON</Text>
                 </TouchableOpacity>
             </View>
@@ -86,11 +95,12 @@ export default class App extends React.Component {
                         color="#0000ff"
                     /> :
                     <View style={{flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-                        <Text style={{flex: 1}}>{this.state.balloonStatusMessage}</Text>
+                        <Text
+                            style={{flex: 1}}>{this.state.balloonStatusMessage}</Text>
                         <Ionicons
                             name="ios-thermometer"
                             size={32}
-                            color={this.state.balloonStatusCode === 0 ? 'blue' : this.state.balloonStatusCode === 1 ? 'red' : 'green'}
+                            color={this.state.balloonStatusCode === 1 ? 'red' : 'green'}
                             style={{flex: 1}}
                         />
                     </View>
@@ -99,12 +109,38 @@ export default class App extends React.Component {
         );
     };
 
-    toogleBalloon = (mode) => {
+    toogleBalloonStatus = (status) => {
         this.setState({
             balloonStatusMessage: 'Je donne tout pour envoyer l\'ordre, chef !',
-            balloonOrder: mode,
+            sentOrder: status,
         });
-        this.sendOrder(mode);
+        this.sendOrder(status);
+    };
+
+    sendOrder = async (order) => {
+        this.setState({isRefreshing: true});
+        try {
+            let response = await fetch(settings.RASBERRYPI_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    'order': order.code,
+                }),
+            });
+            if (response.status === 200) {
+                response = await response.json();
+                this.setState({
+                    balloonStatusCode: response.balloonStatusCode,
+                });
+            }
+        } catch (error) {
+            this.setState({
+                balloonStatusMessage: BALLOON_STATUS.ERROR,
+            });
+        }
+        this.setState({isRefreshing: false});
     };
 
     refreshStatus = async () => {
@@ -119,33 +155,7 @@ export default class App extends React.Component {
                 });
             }
         } catch (error) {
-            this.setState({balloonStatusMessage: BALLOON_STATUS_MESSAGE.ERROR});
-        }
-        this.setState({isRefreshing: false});
-    };
-
-    sendOrder = async (order) => {
-        this.setState({isRefreshing: true});
-        try {
-            let response = await fetch(settings.RASBERRYPI_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    'order': order.code,
-                    'message': order.message,
-                }),
-            });
-            if (response.status === 200) {
-                response = await response.json();
-                this.setState({
-                    balloonStatusCode: response.balloonStatusCode,
-                    balloonStatusMessage: 'Le balloon dit : ' + response.message,
-                });
-            }
-        } catch (error) {
-            this.setState({balloonStatusMessage: BALLOON_STATUS_MESSAGE.ERROR});
+            this.setState({balloonStatusMessage: BALLOON_STATUS.ERROR});
         }
         this.setState({isRefreshing: false});
     };
