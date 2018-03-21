@@ -33,7 +33,7 @@ export default class App extends Component {
     state = {
         balloonStatusMessage: "",
         balloonStatusCode: false,
-        balloonOrder: "",
+        sentOrder: "",
         isRefreshing: "",
     };
 
@@ -66,15 +66,15 @@ export default class App extends Component {
                 flexDirection: 'row',
             }}>
                 <TouchableOpacity onPress={() => {this.toogleBalloon(modes.OFF)}} style={{flex:1, alignItems:'center'}}>
-                    <Ionicons name="ios-snow" size={55} color={this.state.balloonOrder.id === 0 ? "blue" : "black"} />
+                    <Ionicons name="ios-snow" size={55} color={this.state.sentOrder.id === 0 ? "blue" : "black"} />
                     <Text>OFF</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => {this.toogleBalloon(modes.AUTO)}} style={{flex:1, alignItems:'center'}}>
-                    <Ionicons name="md-infinite" size={55} color={this.state.balloonOrder.id === 2 ? "green" : "black"} />
+                    <Ionicons name="md-infinite" size={55} color={this.state.sentOrder.id === 2 ? "green" : "black"} />
                     <Text>AUTO</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => {this.toogleBalloon(modes.ON)}} style={{flex:1, alignItems:'center'}}>
-                    <Ionicons name="ios-bonfire" size={55} color={this.state.balloonOrder.id === 1 ? "red" : "black"} />
+                    <Ionicons name="ios-bonfire" size={55} color={this.state.sentOrder.id === 1 ? "red" : "black"} />
                     <Text>ON</Text>
                 </TouchableOpacity>
             </View>
@@ -106,7 +106,7 @@ export default class App extends Component {
     toogleBalloon = (mode) => {
         this.setState({
             balloonStatusMessage: "Je donne tout pour envoyer l'ordre, chef !",
-            balloonOrder: mode
+            sentOrder: mode
         })
         this.sendOrder(mode);
     }

@@ -4,43 +4,41 @@ import React from 'react';
 import {ActivityIndicator, Button, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import settings from './settings';
 
-const BALLOON_ORDER = {
-    ON: {
-        code: 1,
-    },
-    AUTO: {
-        code: 2,
-    },
-};
-
 const BALLOON_STATUS = [
+        INIT = {
+            message: 'Salut toi !',
+        },
         SENDING_ORDER = {
             message: 'Je donne tout pour envoyer l\'ordre, chef !',
         },
         ON = {
             message: 'Ca chauffe dans mon body !!!',
-            orderCode: 1,
+            orderCode: 'ON',
         },
         AUTO = {
             message: 'Je gère, l\'ami !',
-            orderCode: 2,
+            orderCode: 'AUTO',
         },
-        ERROR = {
+        ERR = {
             message: 'J\'arrive pas à joindre le balloon l\'ami !',
         },
     ]
 ;
 
 export default class App extends React.Component {
-    state = {
-        balloonStatusCode: null,
-        balloonStatusMessage: '',
-        sentOrder: '',
-        isRefreshing: '',
-    };
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            balloonStatusCode: null,
+            balloonStatus: '',
+            sentOrder: '',
+            isRefreshing: '',
+        };
+    }
 
     componentWillMount() {
-        this.refreshStatus();
+        // this.refreshStatus();
     }
 
     render() {
@@ -96,11 +94,13 @@ export default class App extends React.Component {
                     /> :
                     <View style={{flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
                         <Text
-                            style={{flex: 1}}>{this.state.balloonStatusMessage}</Text>
+                            style={{flex: 1}}>{
+                            console.warn("state : " + this.state.balloonStatus)
+                        }</Text>
                         <Ionicons
                             name="ios-thermometer"
                             size={32}
-                            color={this.state.balloonStatusCode === 1 ? 'red' : 'green'}
+                            color={this.state.balloonStatus === BALLOON_STATUS.ON ? 'red' : 'green'}
                             style={{flex: 1}}
                         />
                     </View>
@@ -120,24 +120,21 @@ export default class App extends React.Component {
     sendOrder = async (order) => {
         this.setState({isRefreshing: true});
         try {
-            let response = await fetch(settings.RASBERRYPI_URL, {
-                method: 'POST',
+            let response = await fetch(settings.RASBERRYPI_URL + '/ORDER=' + order.orderCode, {
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    'order': order.code,
-                }),
             });
             if (response.status === 200) {
                 response = await response.json();
                 this.setState({
-                    balloonStatusCode: response.balloonStatusCode,
+                    balloonStatusCode: this.getStatusFromCode(response.status),
                 });
             }
         } catch (error) {
             this.setState({
-                balloonStatusMessage: BALLOON_STATUS.ERROR,
+                balloonStatus: BALLOON_STATUS.ERR,
             });
         }
         this.setState({isRefreshing: false});
@@ -146,18 +143,25 @@ export default class App extends React.Component {
     refreshStatus = async () => {
         this.setState({isRefreshing: true});
         try {
-            let response = await fetch(settings.RASBERRYPI_URL);
+            let response = await fetch(settings.RASBERRYPI_URL + '/STATUS');
+            console.warn("response : ");
+
             if (response.status === 200) {
                 response = await response.json();
                 this.setState({
-                    balloonStatusCode: response.balloonStatusCode,
-                    balloonStatusMessage: 'Le balloon dit : ' + response.message,
+                    balloonStatusCode: this.getStatusFromCode(response.status),
                 });
             }
         } catch (error) {
-            this.setState({balloonStatusMessage: BALLOON_STATUS.ERROR});
+            this.setState({balloonStatus: BALLOON_STATUS.ERR});
         }
         this.setState({isRefreshing: false});
+    };
+
+    getStatusFromCode = (statusCode) => {
+        console.warn("getStatus : " + statusCode);
+        return BALLOON_STATUS
+            .filter(status => status.orderCode === statusCode)[0];
     };
 }
 
